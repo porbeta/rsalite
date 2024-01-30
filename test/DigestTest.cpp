@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../Digest.h"
+#include "../RSALite.h"
 #include <string>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

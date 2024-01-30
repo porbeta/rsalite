@@ -20,7 +20,7 @@ public:
     static BigInteger* nbi();
     static BigInteger* nbv(int i);
 
-    std::vector<uint32_t> data;
+    std::vector<unsigned int> data;
     int t = 0;
     int s = 0;
 
@@ -38,7 +38,7 @@ public:
     void dlShiftTo(int n, BigInteger& r);
     void subTo(BigInteger& a, BigInteger& r);
     void rShiftTo(int n, BigInteger& r);
-    uint32_t am(int i, double x, BigInteger& w, int j, double c, int n);
+    unsigned int am(int i, double x, BigInteger& w, int j, double c, int n);
     int invDigit();
     int compareTo(BigInteger& a);
     void copyTo(BigInteger& r);
@@ -52,7 +52,7 @@ public:
     BigInteger* multiply(BigInteger& a);
     std::string toString();
     void print();
-    uint32_t intValue();
+    unsigned int intValue();
 
 private:
     std::map<int, int> BI_RC;
@@ -60,7 +60,7 @@ private:
 
     void _init();
     int _intAt(const std::string& s, int i);
-    int _nbits(uint32_t x);
+    int _nbits(unsigned int x);
 };
 
 #endif

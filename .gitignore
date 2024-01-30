@@ -1,6 +1,5 @@
 .vs/
 x64/
-test/
 rsalite.sln
 rsalite.vcxproj
 rsalite.vcxproj.filters

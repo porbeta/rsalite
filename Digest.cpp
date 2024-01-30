@@ -5,26 +5,26 @@
 #include <string>
 #include <cstdint>
 
-std::vector<uint32_t> Digest::_convertStringToWordArray(std::string latin1Str) {
-    uint32_t latin1StrLength = latin1Str.length();
-    std::vector<uint32_t> words(latin1StrLength / 4, 0);
-    for (uint32_t i = 0; i < latin1StrLength; i++) {
+std::vector<unsigned int> Digest::_convertStringToWordArray(std::string latin1Str) {
+    unsigned int latin1StrLength = latin1Str.length();
+    std::vector<unsigned int> words(latin1StrLength / 4, 0);
+    for (unsigned int i = 0; i < latin1StrLength; i++) {
         words[i >> 2] |= (latin1Str[i] & 0xff) << (24 - (i % 4) * 8);
     }
     return words;
 }
 
-std::string Digest::_convertWordArrayToString(std::vector<uint32_t> words, int sigBytes) {
+std::string Digest::_convertWordArrayToString(std::vector<unsigned int> words, int sigBytes) {
     std::string hexChars;
-    for (uint32_t i = 0; i < sigBytes; i++) {
-        uint32_t bite = (words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
+    for (unsigned int i = 0; i < sigBytes; i++) {
+        unsigned int bite = (words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
         hexChars.push_back(_intToHex(bite >> 4));
         hexChars.push_back(_intToHex(bite & 0x0f));
     }
     return hexChars;
 }
 
-char Digest::_intToHex(uint32_t val) {
+char Digest::_intToHex(unsigned int val) {
     if (val < 0 || val > 15) {
         throw std::invalid_argument("number does not correspond to hex value");
     }
@@ -53,7 +53,7 @@ char Digest::_intToHex(uint32_t val) {
     return val + '0';
 }
 
-void Digest::_process(std::vector<uint32_t>& H, std::vector<uint32_t>& K, std::vector<uint32_t>& W, std::vector<uint32_t>& dataWords, int dataSigBytes) {
+void Digest::_process(std::vector<unsigned int>& H, std::vector<unsigned int>& K, std::vector<unsigned int>& W, std::vector<unsigned int>& dataWords, int dataSigBytes) {
     int blockSize = 16;
     int blockSizeBytes = blockSize * 4;
     // Count blocks ready
@@ -68,33 +68,33 @@ void Digest::_process(std::vector<uint32_t>& H, std::vector<uint32_t>& K, std::v
         for (int offset = 0; offset < nWordsReady; offset += blockSize) {
             // Perform concrete-algorithm logic
             // Working variables
-            uint32_t a = H[0];
-            uint32_t b = H[1];
-            uint32_t c = H[2];
-            uint32_t d = H[3];
-            uint32_t e = H[4];
-            uint32_t f = H[5];
-            uint32_t g = H[6];
-            uint32_t h = H[7];
+            unsigned int a = H[0];
+            unsigned int b = H[1];
+            unsigned int c = H[2];
+            unsigned int d = H[3];
+            unsigned int e = H[4];
+            unsigned int f = H[5];
+            unsigned int g = H[6];
+            unsigned int h = H[7];
             // Computation
             for (int i = 0; i < 64; i++) {
                 if (i < 16) {
                     W[i] = dataWords[offset + i] | 0;
                 }
                 else {
-                    uint32_t gamma0x = W[i - 15];
-                    uint32_t gamma0 = ((gamma0x << 25) | (gamma0x >> 7)) ^
+                    unsigned int gamma0x = W[i - 15];
+                    unsigned int gamma0 = ((gamma0x << 25) | (gamma0x >> 7)) ^
                         ((gamma0x << 14) | (gamma0x >> 18)) ^
                         (gamma0x >> 3);
-                    uint32_t gamma1x = W[i - 2];
-                    uint32_t gamma1 = ((gamma1x << 15) | (gamma1x >> 17)) ^
+                    unsigned int gamma1x = W[i - 2];
+                    unsigned int gamma1 = ((gamma1x << 15) | (gamma1x >> 17)) ^
                         ((gamma1x << 13) | (gamma1x >> 19)) ^
                         (gamma1x >> 10);
                     W[i] = gamma0 + gamma1 + W[i - 16] + W[i - 7];
                 }
             }
             // More computation
-            uint32_t temp1, temp2, ch, maj, sigma0, sigma1;
+            unsigned int temp1, temp2, ch, maj, sigma0, sigma1;
             for (int i = 0; i < 64; i++) {
                 sigma1 = ((e << 26) | (e >> 6)) ^ ((e << 21) | (e >> 11)) ^ ((e << 7) | (e >> 25));
                 ch = (e & f) ^ (~e & g);
@@ -125,19 +125,19 @@ void Digest::_process(std::vector<uint32_t>& H, std::vector<uint32_t>& K, std::v
 }
 
 std::string Digest::digestStringWithSHA256(const std::string& data) {
-    std::vector<uint32_t> H{ 1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225 };
-    std::vector<uint32_t> K{ 1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080,  310598401,  607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774,  264347078,  604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711,  113926993,  338241895, 666307205,  773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909,  275423344, 430227734,  506948616,  659060556,  883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298 };
-    std::vector<uint32_t> W(64, 0);
+    std::vector<unsigned int> H{ 1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225 };
+    std::vector<unsigned int> K{ 1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080,  310598401,  607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774,  264347078,  604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711,  113926993,  338241895, 666307205,  773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909,  275423344, 430227734,  506948616,  659060556,  883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298 };
+    std::vector<unsigned int> W(64, 0);
 
     size_t sigBytes = H.size() * 4;
 
     // Start _append
-    std::vector<uint32_t> dataWords = _convertStringToWordArray(data);
+    std::vector<unsigned int> dataWords = _convertStringToWordArray(data);
     size_t dataSigBytes = dataWords.size() * 4;
 
     size_t initialLength = (sigBytes >> 2) + 1;
     size_t oldDataSigBytes = 0;
-    std::vector<uint32_t> oldDataWords(initialLength, oldDataSigBytes);
+    std::vector<unsigned int> oldDataWords(initialLength, oldDataSigBytes);
 
     // Clamp
     oldDataWords[sigBytes >> 2] &= 0xffffffff << (32 - (sigBytes % 4) * 8);
@@ -145,7 +145,7 @@ std::string Digest::digestStringWithSHA256(const std::string& data) {
 
     // Concat
     for (size_t i = 0; i < oldDataSigBytes; i++) {
-        uint32_t dataByte = (dataWords[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
+        unsigned int dataByte = (dataWords[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
         oldDataWords[(sigBytes + i) >> 2] |= dataByte << (24 - ((sigBytes + i) % 4) * 8);
     }
 
@@ -153,7 +153,7 @@ std::string Digest::digestStringWithSHA256(const std::string& data) {
 
     // End _append
 
-    std::vector<uint32_t> dW1 = std::vector<uint32_t>(dataWords.begin(), dataWords.end());
+    std::vector<unsigned int> dW1 = std::vector<unsigned int>(dataWords.begin(), dataWords.end());
 
     _process(H, K, W, dW1, dataSigBytes);
 
@@ -164,11 +164,11 @@ std::string Digest::digestStringWithSHA256(const std::string& data) {
     size_t nBitsLeft = dataSigBytes * 8;
 
     // Add padding
-    std::vector<uint32_t> dW2((((nBitsLeft + 64) >> 9) << 4 | 15) + 1, 0);
+    std::vector<unsigned int> dW2((((nBitsLeft + 64) >> 9) << 4 | 15) + 1, 0);
 
     dW2[nBitsLeft >> 5] |= 0x80 << (24 - nBitsLeft % 32);
-    dW2[((nBitsLeft + 64) >> 9) << 4 | 14] = static_cast<uint32_t>(nBitsTotal / 0x100000000);
-    dW2[((nBitsLeft + 64) >> 9) << 4 | 15] = static_cast<uint32_t>(nBitsTotal);
+    dW2[((nBitsLeft + 64) >> 9) << 4 | 14] = static_cast<unsigned int>(nBitsTotal / 0x100000000);
+    dW2[((nBitsLeft + 64) >> 9) << 4 | 15] = static_cast<unsigned int>(nBitsTotal);
     dataSigBytes = dW2.size() * 4;
 
     // Hash final blocks
@@ -247,7 +247,7 @@ char Digest::int2char(int n) {
 
 std::string Digest::hex2b64(std::string h) {
     int i;
-    uint32_t c;
+    unsigned int c;
     std::string ret = "";
 
     for (i = 0; i + 3 <= h.length(); i += 3) {

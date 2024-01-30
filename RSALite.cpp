@@ -6,11 +6,7 @@
 #include "RSAKey.h"
 #include "RSALite.h"
 
-char* RSALite::createJWT(char* h, char* pl, char* pKey) {
-    std::string header(h);
-    std::string payload(pl);
-    std::string privateKey(pKey);
-
+std::string RSALite::createJWT(std::string header, std::string payload, std::string privateKey) {
     std::string signingInput = Digest::urlsafeB64Encode(header) + "." + Digest::urlsafeB64Encode(payload);
     std::string sHashHex = Digest::digestStringWithSHA256(signingInput);
 

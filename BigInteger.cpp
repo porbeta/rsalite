@@ -16,7 +16,7 @@ const double BigInteger::FV = std::pow(2, BigInteger::BI_FP);
 const int BigInteger::F1 = BI_FP - DB;
 const int BigInteger::F2 = 2 * DB - BI_FP;
 
-std::vector<uint32_t> data;
+std::vector<unsigned int> data;
 int t = 0;
 int s = 0;
 
@@ -101,7 +101,7 @@ void BigInteger::fromInt(int x) {
     else this->t = 0;
 }
 
-uint32_t BigInteger::intValue() {
+unsigned int BigInteger::intValue() {
     if (this->s < 0) {
         if (this->t == 1) return this->data[0] - this->DV;
         else if (this->t == 0) return -1;
@@ -254,7 +254,7 @@ void BigInteger::rShiftTo(int n, BigInteger& r) {
     r.clamp();
 }
 
-uint32_t BigInteger::am(int i, double x, BigInteger& w, int j, double c, int n) {
+unsigned int BigInteger::am(int i, double x, BigInteger& w, int j, double c, int n) {
     while (--n >= 0) {
         long long v = x * this->data[i++] + w.data[j] + c;
         c = std::floor(v / 0x4000000);
@@ -310,7 +310,7 @@ void BigInteger::squareTo(BigInteger& r) {
     while (--i >= 0) r.data[i] = 0;
 
     for (i = 0; i < this->t - 1; ++i) {
-        uint32_t c = this->am(i, this->data[i], r, 2 * i, 0, 1);
+        unsigned int c = this->am(i, this->data[i], r, 2 * i, 0, 1);
         if ((r.data[i + this->t] += this->am(i + 1, 2 * this->data[i], r, 2 * i + 1, c, this->t - i - 1)) >= this->DV) {
             r.data[i + this->t] -= this->DV;
             r.data[i + this->t + 1] = 1;
@@ -558,7 +558,7 @@ int BigInteger::_intAt(const std::string &s, int i) {
     return -1;
 }
 
-int BigInteger::_nbits(uint32_t x) {
+int BigInteger::_nbits(unsigned int x) {
     int r = 1, t;
     if ((t = x >> 16) != 0) { x = t; r += 16; }
     if ((t = x >> 8) != 0) { x = t; r += 8; }

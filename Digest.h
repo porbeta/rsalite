@@ -21,10 +21,10 @@ public:
 private:
     static const std::string base64_chars;
     static const std::string BI_RM;
-    static std::vector<uint32_t> _convertStringToWordArray(std::string latin1Str);
-    static std::string _convertWordArrayToString(std::vector<uint32_t> words, int sigBytes);
-    static char _intToHex(uint32_t val);
-    static void _process(std::vector<uint32_t>& H, std::vector<uint32_t>& K, std::vector<uint32_t>& W, std::vector<uint32_t>& dataWords, int dataSigBytes);
+    static std::vector<unsigned int> _convertStringToWordArray(std::string latin1Str);
+    static std::string _convertWordArrayToString(std::vector<unsigned int> words, int sigBytes);
+    static char _intToHex(unsigned int val);
+    static void _process(std::vector<unsigned int>& H, std::vector<unsigned int>& K, std::vector<unsigned int>& W, std::vector<unsigned int>& dataWords, int dataSigBytes);
     static std::string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 };
 

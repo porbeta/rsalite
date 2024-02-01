@@ -1,7 +1,6 @@
 #include "RSALite.h"
 #include <string>
 #include <iostream>
-#include <regex>
 #include <cmath>
 #include <vector>
 #include <map>
@@ -1058,19 +1057,10 @@ std::string RSAKey::_pemtohex(std::string s, std::string sHead) {
         throw std::invalid_argument("sHead cannot be null");
     }
 
-    std::regex e1("^[^]*-----BEGIN " + sHead + "-----");
-    std::regex e2("-----END " + sHead + "-----[^]*$");
+    std::string cleanS = this->_getCleanB64(s);
+    
+    std::string hex = this->_b64tohex(cleanS);
 
-    s = std::regex_replace(s, e1, "");
-    s = std::regex_replace(s, e2, "");
-
-    return this->_b64nltohex(s);
-}
-
-std::string RSAKey::_b64nltohex(std::string s) {
-    std::regex e("/[^0-9A-Za-z/+=]*/ g");
-    std::string b64 = std::regex_replace(s, e, "");
-    std::string hex = this->_b64tohex(b64);
     return hex;
 }
 
@@ -1259,4 +1249,24 @@ void RSAKey::_setPrivateEx(std::string N, std::string E, std::string D, std::str
     else {
         throw new std::invalid_argument("Invalid RSA private key in RSASetPrivateEx");
     }
+}
+
+std::string RSAKey::_getCleanB64(std::string str) {
+    std::string ret = "";
+    std::string begin = "-----BEGIN PRIVATE KEY-----";
+    std::string end = "-----END PRIVATE KEY-----";
+
+    for (int i = 0; i < str.length(); i++) {
+        if (str.substr(i, begin.length()).compare(begin) == 0) {
+            i += begin.length() - 1;
+        }
+        else if (str.substr(i, end.length()).compare(end) == 0) {
+            i += end.length() - 1;
+        }
+        else if (str[i] != '\n' && str[i] != '\r' && str[i] != '\t' && str[i] != ' ') {
+            ret += str[i];
+        }
+    }
+
+    return ret;
 }

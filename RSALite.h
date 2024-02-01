@@ -131,7 +131,6 @@ public:
 private:
     void _readPKCS8PrvKeyHex(std::string h);
     std::string _pemtohex(std::string s, std::string sHead);
-    std::string _b64nltohex(std::string s);
     std::string _b64tohex(std::string s);
     bool _isASN1HEX(std::string hex);
     int _getVblen(std::string s, int idx);
@@ -144,6 +143,7 @@ private:
     std::vector<int> _getChildIdx(std::string h, int idx);
     int _getTLVblen(std::string h, int idx);
     void _setPrivateEx(std::string N, std::string E, std::string D, std::string P, std::string Q, std::string DP, std::string DQ, std::string C);
+    std::string _getCleanB64(std::string str);
 };
 
 #endif

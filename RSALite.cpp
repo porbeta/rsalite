@@ -624,6 +624,9 @@ int BigInteger::_nbits(unsigned int x) {
     return r;
 }
 
+std::vector<unsigned int> Digest::digestDataWords;
+int Digest::digestDataSigBytes = 0;
+
 std::vector<unsigned int> Digest::_convertStringToWordArray(std::string latin1Str) {
     unsigned int latin1StrLength = latin1Str.length();
     std::vector<unsigned int> words(latin1StrLength / 4, 0);
@@ -741,6 +744,14 @@ void Digest::_process(std::vector<unsigned int>& H, std::vector<unsigned int>& K
             H[7] += h;
         }
     }
+
+    dataWords.erase(dataWords.begin(), dataWords.begin() + nWordsReady);
+    digestDataWords.resize(dataWords.size());
+
+    for (int i = 0; i < dataWords.size(); i++) digestDataWords[i] = dataWords[i];
+
+    dataSigBytes -= nBytesReady;
+    digestDataSigBytes = dataSigBytes;
 }
 
 std::string Digest::digestStringWithSHA256(const std::string& data) {
@@ -777,13 +788,17 @@ std::string Digest::digestStringWithSHA256(const std::string& data) {
     _process(H, K, W, dW1, dataSigBytes);
 
     dataWords.clear();
-    dataSigBytes = 0;
+    dataWords.resize(digestDataWords.size());
+    for (int i = 0; i < digestDataWords.size(); i++) dataWords[i] = digestDataWords[i];
+
+    dataSigBytes = digestDataSigBytes;
 
     size_t nBitsTotal = nDataBytes * 8;
     size_t nBitsLeft = dataSigBytes * 8;
 
     // Add padding
-    std::vector<unsigned int> dW2((((nBitsLeft + 64) >> 9) << 4 | 15) + 1, 0);
+    std::vector<unsigned int> dW2(dataWords.size() + (((nBitsLeft + 64) >> 9) << 4 | 15) + 1, 0);
+    for (int j = 0; j < dataWords.size(); j++) dW2[j] = dataWords[j];
 
     dW2[nBitsLeft >> 5] |= 0x80 << (24 - nBitsLeft % 32);
     dW2[((nBitsLeft + 64) >> 9) << 4 | 14] = static_cast<unsigned int>(nBitsTotal / 0x100000000);

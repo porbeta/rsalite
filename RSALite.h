@@ -91,6 +91,8 @@ private:
     static char _intToHex(unsigned int val);
     static void _process(std::vector<unsigned int>& H, std::vector<unsigned int>& K, std::vector<unsigned int>& W, std::vector<unsigned int>& dataWords, int dataSigBytes);
     static std::string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
+    static std::vector<unsigned int> digestDataWords;
+    static int digestDataSigBytes;
 };
 
 class Montgomery
